@@ -114,7 +114,7 @@ const MailComponent = () => {
           headers: {
             accept: "application/json",
             "api-key":
-              "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",
+              "add api key",
             "content-type": "application/json",
           },
         }
