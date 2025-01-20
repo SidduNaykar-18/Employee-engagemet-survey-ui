@@ -4,39 +4,37 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { resetSurveyData, addSurvey } from "../../redux/slices/surveySlice";
 import { message } from "antd";
+import CustomLoading from "../CustomLoading";
 
 const CustomSubmitButton = ({ onClick, onValidate }) => {
   const dispatch = useDispatch();
   const surveyData = useSelector((state) => state.surveyData);
   const { surveys, loading, error } = useSelector((state) => state.surveyData);
-  
+
   const navigate = useNavigate();
   const [isValid, setIsValid] = useState(false);
   const overallSatsData = useSelector(
     (state) => state?.surveyData?.overallSatisfactionEngagement
   );
- 
+  
+  console.log("Current Redux State: ", { surveys, loading, error });
 
   const finalPayload = {
     surveyId: "e74af703-e6f1-48d2-8965-73c723b5e40e",
     questionDetails: [
-      surveyData?.resources?.radioResponse,
+      surveyData?.resources?.radioResponse1,
       surveyData?.resources?.sliderResponse1,
       surveyData?.resources?.sliderResponse2,
-
-      surveyData?.recognitionSupport?.radioResponse,
+      surveyData?.recognitionSupport?.radioResponse1,
       surveyData?.recognitionSupport?.sliderResponse1,
-      surveyData?.recognitionSupport?.sliderResponse2,
-
-      surveyData?.developmentGrowth?.radioResponse,
+      surveyData?.recognitionSupport?.radioResponse2,
+      surveyData?.developmentGrowth?.radioResponse1,
+      surveyData?.developmentGrowth?.radioResponse2,
       surveyData?.developmentGrowth?.sliderResponse1,
       surveyData?.developmentGrowth?.sliderResponse2,
-
-      surveyData?.workEnvironmentRelationships?.radioResponse,
+      surveyData?.workEnvironmentRelationships?.sliderResponse1,
       surveyData?.workEnvironmentRelationships?.inputResponse1,
       surveyData?.workEnvironmentRelationships?.inputResponse2,
-
-      surveyData?.overallSatisfactionEngagement?.radioResponse,
       surveyData?.overallSatisfactionEngagement?.sliderResponse1,
       surveyData?.overallSatisfactionEngagement?.sliderResponse2,
     ],
@@ -45,37 +43,33 @@ const CustomSubmitButton = ({ onClick, onValidate }) => {
   useEffect(() => {
     if (!overallSatsData || Object.keys(overallSatsData)?.length === 0) return;
     const isValid =
-      overallSatsData?.radioResponse &&
-      overallSatsData?.sliderResponse1 &&
-      overallSatsData?.sliderResponse2;
-
+      overallSatsData?.sliderResponse1 && overallSatsData?.sliderResponse2;
     setIsValid(isValid);
-
     onValidate(isValid);
   }, [overallSatsData, onValidate]);
 
-  // const handleSubmit = () => {
-  //   if (isValid) {
-  //     dispatch(addSurvey(finalPayload));
-  //     navigate("/employee-engagement/thank-you");
-  //     dispatch(resetSurveyData());
-  //   } else {
-  //     message.error("Please complete all fields before proceeding");
-  //   }
-  // };
   const handleSubmit = async () => {
     if (isValid) {
-      dispatch(addSurvey(finalPayload));
-      if (error) {
-        message.error("Submission failed, please try again.");
+      await dispatch(addSurvey(finalPayload));
+
+      if (loading) {
+        return (
+          <>
+            <CustomLoading />
+          </>
+        );
+      }
+      if (error?.status === "failure") {
+        message.error("Submission Failed please try again later");
       } else {
-        navigate("/employee-engagement/thank-you");
         dispatch(resetSurveyData());
+        navigate("/employee-engagement/thank-you");
       }
     } else {
       message.error("Please complete all fields before proceeding");
     }
   };
+
   return (
     <div
       style={{

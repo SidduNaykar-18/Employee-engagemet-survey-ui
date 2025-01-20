@@ -30,7 +30,7 @@ const LayoutPage = () => {
     }
   }, [dispatch, surveyId]);
 
-  const questions = useSelector((state) => state?.surveyData?.questions);
+  const questions = useSelector((state) => state?.surveyData?.questions?.data);
 
   const menu = (
     <Menu onClick={handleMenuClick}>

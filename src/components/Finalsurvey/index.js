@@ -9,7 +9,8 @@ import CustomLoading from "../CustomLoading";
 
 const FinalSurvey = () => {
   const dispatch = useDispatch();
-  const { surveys, loading, error } = useSelector((state) => state.surveyData);
+  const surveys = useSelector((state) => state.surveyData?.surveys?.data);
+  const { error, loading } = useSelector((state) => state.surveyData);
 
   useEffect(() => {
     const surveyId =
@@ -17,18 +18,35 @@ const FinalSurvey = () => {
     dispatch(getAllSurveys(surveyId));
   }, [dispatch]);
 
-  const groupedQuestions = surveys.reduce((acc, employee) => {
+  // Filter and group the survey data while maintaining unique questions
+  const groupedQuestions = Array.isArray(surveys) ? surveys.reduce((acc, employee) => {
     employee.responses.forEach((response) => {
       const { questionGroupTitle, question, submittedAnswer } = response;
+
+      // Create a group if not existing
       if (!acc[questionGroupTitle]) {
         acc[questionGroupTitle] = [];
       }
-      if (acc[questionGroupTitle].length < 3) {
+
+      // "Development & Growth" Section - Only the first 4 questions
+      if (questionGroupTitle === "Development & Growth" && acc[questionGroupTitle].length < 4) {
+        if (!acc[questionGroupTitle].some(q => q.question === question)) {
+          acc[questionGroupTitle].push({ question, submittedAnswer });
+        }
+      }
+      // "Overall Satisfaction" Section - Only the last 2 questions
+      else if (questionGroupTitle === "Overall Satisfaction" && acc[questionGroupTitle].length < 2) {
+        if (!acc[questionGroupTitle].some(q => q.question === question)) {
+          acc[questionGroupTitle].push({ question, submittedAnswer });
+        }
+      }
+      // Other sections - avoid duplicates
+      else if (!acc[questionGroupTitle].some(q => q.question === question)) {
         acc[questionGroupTitle].push({ question, submittedAnswer });
       }
     });
     return acc;
-  }, {});
+  }, {}) : {};
 
   const tableData = Object.keys(groupedQuestions).map((groupTitle) => ({
     title: groupTitle,
@@ -39,6 +57,7 @@ const FinalSurvey = () => {
       })
     ),
   }));
+
   if (error) {
     return (
       <div
@@ -69,7 +88,7 @@ const FinalSurvey = () => {
       key: "question",
       width: 350,
     },
-    ...surveys.map((employee, index) => ({
+    ...Array.isArray(surveys) ? surveys.map((employee, index) => ({
       title: `Employee ${index + 1}`,
       dataIndex: `response${index}`,
       key: `response${index}`,
@@ -79,10 +98,10 @@ const FinalSurvey = () => {
         );
         return <span>{response ? response.submittedAnswer : "----"}</span>;
       },
-    })),
+    })) : [],
   ];
 
-  const mergedTableData = tableData.flatMap((group) => [
+  const mergedTableData = Array.isArray(surveys) ? tableData.flatMap((group) => [
     {
       question: <strong>{group.title}</strong>,
       ...surveys.reduce((acc, _, index) => {
@@ -100,12 +119,12 @@ const FinalSurvey = () => {
         return acc;
       }, {}),
     })),
-  ]);
+  ]) : [];
 
   const downloadCSV = () => {
     const header = [
       "Question",
-      ...surveys.map((_, index) => `Employee ${index + 1}`),
+      ...Array.isArray(surveys) ? surveys.map((_, index) => `Employee ${index + 1}`) : [],
     ];
 
     const rows = mergedTableData.flatMap((row) => {
@@ -118,9 +137,9 @@ const FinalSurvey = () => {
         ];
       } else {
         const question = typeof row.question === "string" ? row.question : "";
-        const responses = surveys.map(
+        const responses = Array.isArray(surveys) ? surveys.map(
           (_, index) => row[`response${index}`] || "--------"
-        );
+        ) : [];
         return [[question, ...responses]];
       }
     });
@@ -142,7 +161,7 @@ const FinalSurvey = () => {
   const downloadExcel = () => {
     const header = [
       "Question",
-      ...surveys.map((_, index) => `Employee ${index + 1}`),
+      ...Array.isArray(surveys) ? surveys.map((_, index) => `Employee ${index + 1}`) : [],
     ];
 
     const rows = mergedTableData.flatMap((row) => {
@@ -155,9 +174,9 @@ const FinalSurvey = () => {
         ];
       } else {
         const question = typeof row.question === "string" ? row.question : "";
-        const responses = surveys.map(
+        const responses = Array.isArray(surveys) ? surveys.map(
           (_, index) => row[`response${index}`] || "--------"
-        );
+        ) : [];
         return [[question, ...responses]];
       }
     });

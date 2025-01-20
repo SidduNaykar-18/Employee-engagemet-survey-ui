@@ -1,30 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Card, Slider, Row, Col } from "antd";
+import { Card, Row, Col, Radio } from "antd";
 
-const CustomSliderCard = ({ data, onChange, initialValue }) => {
-  const sliderMarks = {
-    0: "Never",
-    1: "Rarely",
-    2: "Often",
-    3: "Always",
-  };
+const CustomRadioSliderCard = ({ data, onChange, initialValue, section, sliderIndex }) => {
+  const [value, setValue] = useState(initialValue);
 
-  const getNumericValue = (value) => {
-    const keys = Object.keys(sliderMarks);
-    return keys.find(key => sliderMarks[key] === value) || 0; 
-  };
-
-  const [value, setValue] = useState(getNumericValue(initialValue)); 
   useEffect(() => {
     if (initialValue !== undefined) {
-      setValue(getNumericValue(initialValue)); 
+      setValue(initialValue);
     }
   }, [initialValue]);
 
-  const handleSliderChange = (value) => {
-    setValue(value);
-    const label = sliderMarks[value];
-    onChange(label);
+  const handleRadioChange = (e) => {
+    const selectedValue = e.target.value;
+    setValue(selectedValue);
+    onChange(selectedValue); 
   };
 
   return (
@@ -51,25 +40,28 @@ const CustomSliderCard = ({ data, onChange, initialValue }) => {
             alignItems: "flex-start",
           }}
         >
-          <Slider
-            min={0}
-            max={3}
-            marks={sliderMarks}
-            step={null}
+          <Radio.Group
             value={value}
-            onChange={handleSliderChange}
-            tooltipVisible={false}
+            onChange={handleRadioChange}
             style={{
               width: "100%",
               marginTop: "10px",
               fontFamily: "Montserrat-SemiBold",
+           
+      
             }}
-          />
+          >
+            <div style={{ display: "flex", justifyContent: "space-evenly", width: "100%" }}>
+        {data?.options?.map((option) => (
+          <Radio key={option.id} value={option?.value}>
+            {option?.value}
+          </Radio>
+        ))}
+      </div>
+          </Radio.Group>
         </Col>
       </Row>
     </Card>
   );
-};
-
-
-export default CustomSliderCard;
+}
+export default CustomRadioSliderCard;

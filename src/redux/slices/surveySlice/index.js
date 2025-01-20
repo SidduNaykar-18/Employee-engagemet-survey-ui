@@ -9,22 +9,21 @@ export const addSurvey = createAsyncThunk(
       const response = await axiosInstance.post("/response", surveyData);
       return response?.data;
     } catch (error) {
+      // Return the error message to the reducer
       return rejectWithValue(error?.response?.data || "An error occurred");
     }
   }
 );
+
 
 export const getAllSurveys = createAsyncThunk(
   "survey/getAllSurveys",
   async (surveyId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/response?survey-id=${surveyId}`);
-      console.log("check reponce dtaa=====",response?.data);
       return response?.data;
-      
-      
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error?.response?.data || "An error occurred");
     }
   }
 );
@@ -34,10 +33,10 @@ export const getAllQuestions = createAsyncThunk(
   "survey/getAllQuestions",
   async (surveyId, { rejectWithValue }) => {
     try {
-      const response = await  axiosInstance.get(`/questions?survey-id=${surveyId}`);
-      return response.data;
+      const response = await axiosInstance.get(`/questions?survey-id=${surveyId}`);
+      return response?.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error?.response?.data || "An error occurred");
     }
   }
 );
@@ -47,31 +46,31 @@ const surveySlice = createSlice({
   name: "surveyData",
   initialState: {
     surveys: [],
-    questions: [], 
+    questions: [],
     loading: false,
-    error: null,
+    error: null,  
     resources: {
-      radioResponse: null,
+      radioResponse1: null,
       sliderResponse1: null,
       sliderResponse2: null,
     },
     recognitionSupport: {
-      radioResponse: null,
+      radioResponse1: null,
       sliderResponse1: null,
-      sliderResponse2: null,
+      radioResponse2: null,
     },
     developmentGrowth: {
-      radioResponse: null,
+      radioResponse1: null,
+      radioResponse2: null,
       sliderResponse1: null,
       sliderResponse2: null,
     },
     workEnvironmentRelationships: {
-      radioResponse: null,
+      sliderResponse1: null,
       inputResponse1: null,
       inputResponse2: null,
     },
     overallSatisfactionEngagement: {
-      radioResponse: null,
       sliderResponse1: null,
       sliderResponse2: null,
     },
@@ -79,31 +78,33 @@ const surveySlice = createSlice({
   reducers: {
     updateSurveyData: (state, action) => {
       const { section, dataKey, dataValue } = action.payload;
-      state[section][dataKey] = dataValue;
+      if (state[section]) {
+        state[section][dataKey] = dataValue;
+      }
     },
     resetSurveyData: (state) => {
       state.resources = {
-        radioResponse: null,
+        radioResponse1: null,
         sliderResponse1: null,
         sliderResponse2: null,
       };
       state.recognitionSupport = {
-        radioResponse: null,
-        sliderResponse1: null,
-        sliderResponse2: null,
+        radioResponse1: null,
+        sliderResponse: null,
+        radioResponse2: null,
       };
       state.developmentGrowth = {
-        radioResponse: null,
+        radioResponse1: null,
+        radioResponse2: null,
         sliderResponse1: null,
         sliderResponse2: null,
       };
       state.workEnvironmentRelationships = {
-        radioResponse: null,
+        sliderResponse1: null,
         inputResponse1: null,
         inputResponse2: null,
       };
       state.overallSatisfactionEngagement = {
-        radioResponse: null,
         sliderResponse1: null,
         sliderResponse2: null,
       };
@@ -113,15 +114,16 @@ const surveySlice = createSlice({
     // Add Survey
     builder.addCase(addSurvey.pending, (state) => {
       state.loading = true;
-      state.error = null;
+      state.error = null;  // Clear any previous error
     });
     builder.addCase(addSurvey.fulfilled, (state, action) => {
       state.loading = false;
-      state.surveys.push(action.payload.data);
+      state.surveys.push(action.payload);
+      state.error = null;  // Reset error after successful submission
     });
     builder.addCase(addSurvey.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload || "An error occurred";
+      state.error = action.payload || "An error occurred";  // Update error state
     });
 
     // Get All Surveys
@@ -131,11 +133,11 @@ const surveySlice = createSlice({
     });
     builder.addCase(getAllSurveys.fulfilled, (state, action) => {
       state.loading = false;
-      state.surveys = action.payload.data;
+      state.surveys = action.payload;
     });
     builder.addCase(getAllSurveys.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload;
+      state.error = action.payload || "An error occurred";
     });
 
     // Get All Questions
@@ -145,11 +147,11 @@ const surveySlice = createSlice({
     });
     builder.addCase(getAllQuestions.fulfilled, (state, action) => {
       state.loading = false;
-      state.questions = action.payload.data;
+      state.questions = action.payload;
     });
     builder.addCase(getAllQuestions.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload;
+      state.error = action.payload || "An error occurred";
     });
   },
 });
