@@ -11,7 +11,6 @@ const RecognitionSupport = ({ onValidate,questionData }) => {
     (state) => state?.surveyData?.recognitionSupport
   );
 
-
 const data = questionData?.length > 0 ? questionData[3] : {};
 const groupData = {
   title: data?.questionGroupTitle,
