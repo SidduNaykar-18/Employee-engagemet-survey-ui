@@ -1,0 +1,21 @@
+/* styles/colors.css */
+
+:root {
+    --primary-color: #1d1c1c;
+    --text-color: black;
+    --black-color: #333;
+  }
+  
+  /* .dark-theme {
+    --primary-color: #237F96;
+    --link-color: #227084;
+    --success-color: #4FABC5;
+    --warning-color: #70B8CE;
+    --error-color: #8DC5D7;
+    --text-color: #A8D2E0;
+    --black-color: #333;
+    --header-bg-color: #1a1a1a;
+    --sidebar-bg-color: #1a1a1a;
+    --sidebar-text-color: #D1D1D1;
+  }
+   */

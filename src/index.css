@@ -1,0 +1,30 @@
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+ /* 500 font */
+@font-face {
+  font-family: "Montserrat-Medium";
+  src: url("./themes/fonts/Montserrat-Medium.ttf");
+}
+/* 600 font */
+@font-face {
+  font-family: "Montserrat-SemiBold";
+  src: url("./themes/fonts/Montserrat-SemiBold.ttf");
+}
+/* 700 font */
+@font-face {
+  font-family: "Montserrat-Bold";
+  src: url("./themes/fonts/Montserrat-Bold.ttf");
+}
+ 
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+ 
