@@ -5,13 +5,15 @@ import { getAllSurveys } from "../../redux/slices/surveySlice";
 import "./FinalSurvey.css";
 import * as XLSX from "xlsx";
 import { DownOutlined } from "@ant-design/icons";
+import CustomLoading from "../CustomLoading";
 
 const FinalSurvey = () => {
   const dispatch = useDispatch();
   const { surveys, loading, error } = useSelector((state) => state.surveyData);
 
   useEffect(() => {
-    const surveyId = process.env.REACT_APP_SURVEY_ID || "e74af703-e6f1-48d2-8965-73c723b5e40e";
+    const surveyId =
+      process.env.REACT_APP_SURVEY_ID || "e74af703-e6f1-48d2-8965-73c723b5e40e";
     dispatch(getAllSurveys(surveyId));
   }, [dispatch]);
 
@@ -215,16 +217,18 @@ const FinalSurvey = () => {
           </Dropdown>
         </div>
       </div>
-
-      <Table
-        dataSource={mergedTableData}
-        columns={columns}
-        rowKey="question"
-        pagination={false}
-        bordered
-        tableLayout="fixed"
-        loading={loading}
-      />
+      {loading ? (
+        <CustomLoading />
+      ) : (
+        <Table
+          dataSource={mergedTableData}
+          columns={columns}
+          rowKey="question"
+          pagination={false}
+          bordered
+          tableLayout="fixed"
+        />
+      )}
     </div>
   );
 };
