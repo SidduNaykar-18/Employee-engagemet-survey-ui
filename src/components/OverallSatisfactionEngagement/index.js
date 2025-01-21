@@ -13,7 +13,7 @@ const OverallSatisfactionEngagement = ({ onValidate, questionData }) => {
     (state) => state?.surveyData?.overallSatisfactionEngagement
   );
 
-  console.log("Overall Satisfaction Data:", overallSatsData); // Log overall data
+  console.log("Overall Satisfaction Data:", overallSatsData);
 
   useEffect(() => {
     if (!overallSatsData || Object.keys(overallSatsData)?.length === 0) return;
@@ -21,7 +21,7 @@ const OverallSatisfactionEngagement = ({ onValidate, questionData }) => {
     const isValid =
       overallSatsData?.sliderResponse1 && overallSatsData?.sliderResponse2;
 
-    console.log("Validation Status:", isValid); // Log validation status
+    console.log("Validation Status:", isValid); 
 
     onValidate(isValid);
   }, [overallSatsData, onValidate]);

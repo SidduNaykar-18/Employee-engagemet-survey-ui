@@ -10,17 +10,17 @@ const CustomSubmitButton = ({ onClick, onValidate }) => {
   const dispatch = useDispatch();
   const surveyData = useSelector((state) => state.surveyData);
   const { surveys, loading, error } = useSelector((state) => state.surveyData);
+  console.log("check status=============", error);
 
   const navigate = useNavigate();
   const [isValid, setIsValid] = useState(false);
   const overallSatsData = useSelector(
     (state) => state?.surveyData?.overallSatisfactionEngagement
   );
-  
-  console.log("Current Redux State: ", { surveys, loading, error });
 
   const finalPayload = {
     surveyId: "e74af703-e6f1-48d2-8965-73c723b5e40e",
+    employeeId: generateDeviceId(),
     questionDetails: [
       surveyData?.resources?.radioResponse1,
       surveyData?.resources?.sliderResponse1,
@@ -48,27 +48,55 @@ const CustomSubmitButton = ({ onClick, onValidate }) => {
     onValidate(isValid);
   }, [overallSatsData, onValidate]);
 
-  const handleSubmit = async () => {
-    if (isValid) {
-      await dispatch(addSurvey(finalPayload));
-
-      if (loading) {
-        return (
-          <>
-            <CustomLoading />
-          </>
-        );
-      }
-      if (error?.status === "failure") {
-        message.error("Submission Failed please try again later");
+  useEffect(() => {
+    if (loading) {
+      return (
+        <>
+          <CustomLoading />
+        </>
+      );
+    }
+    if (error?.status === "failure") {
+      if (error?.message === "Sorry, You have already Submitted") {
+        navigate("/employee-engagement/already-submitted");
       } else {
-        dispatch(resetSurveyData());
-        navigate("/employee-engagement/thank-you");
+        navigate("/employee-engagement/failed-submission");
       }
-    } else {
-      message.error("Please complete all fields before proceeding");
+    } else if (!error === null) {
+      navigate("/employee-engagement/thank-you");
+    }
+  }, [error, navigate]);
+
+  const handleSubmit = async () => {
+    try {
+      if (loading) {
+        message.info("Loading, please wait...");
+        return;
+      }
+
+      if (!isValid) {
+        message.error("Please complete all fields before proceeding.");
+        return;
+      }
+      if (finalPayload) {
+        await dispatch(addSurvey(finalPayload));
+      }
+      dispatch(resetSurveyData());
+    } catch (err) {
+      console.error("Unexpected error during submission:", err);
+      message.error("An unexpected error occurred. Please try again.");
     }
   };
+
+  function generateDeviceId() {
+    if (localStorage.getItem("deviceId")) {
+      return localStorage.getItem("deviceId");
+    } else {
+      const uniqueId = `device-${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem("deviceId", uniqueId);
+      return uniqueId;
+    }
+  }
 
   return (
     <div
