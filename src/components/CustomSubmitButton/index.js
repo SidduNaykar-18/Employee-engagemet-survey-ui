@@ -6,16 +6,15 @@ import { resetSurveyData, addSurvey } from "../../redux/slices/surveySlice";
 import { message } from "antd";
 import CustomLoading from "../CustomLoading";
 
-const CustomSubmitButton = ({ onClick, onValidate }) => {
+const CustomSubmitButton = ({ onValidate }) => {
   const dispatch = useDispatch();
   const surveyData = useSelector((state) => state.surveyData);
-  const { surveys, loading, error } = useSelector((state) => state.surveyData);
-  console.log("check status=============", error);
-
+  const { loading, error, success, alreadySubmitted, submissionFailed } = surveyData;
   const navigate = useNavigate();
   const [isValid, setIsValid] = useState(false);
-  const overallSatsData = useSelector(
-    (state) => state?.surveyData?.overallSatisfactionEngagement
+
+  const overallSatisfactionEngagement = useSelector(
+    (state) => state.surveyData?.overallSatisfactionEngagement
   );
 
   const finalPayload = {
@@ -41,31 +40,22 @@ const CustomSubmitButton = ({ onClick, onValidate }) => {
   };
 
   useEffect(() => {
-    if (!overallSatsData || Object.keys(overallSatsData)?.length === 0) return;
     const isValid =
-      overallSatsData?.sliderResponse1 && overallSatsData?.sliderResponse2;
+      overallSatisfactionEngagement?.sliderResponse1 &&
+      overallSatisfactionEngagement?.sliderResponse2;
     setIsValid(isValid);
     onValidate(isValid);
-  }, [overallSatsData, onValidate]);
+  }, [overallSatisfactionEngagement, onValidate]);
 
   useEffect(() => {
-    if (loading) {
-      return (
-        <>
-          <CustomLoading />
-        </>
-      );
-    }
-    if (error?.status === "failure") {
-      if (error?.message === "Sorry, You have already Submitted") {
-        navigate("/employee-engagement/already-submitted");
-      } else {
-        navigate("/employee-engagement/failed-submission");
-      }
-    } else if (!error === null) {
+    if (success) {
       navigate("/employee-engagement/thank-you");
+    } else if (alreadySubmitted) {
+      navigate("/employee-engagement/already-submitted");
+    } else if (submissionFailed) {
+      navigate("/employee-engagement/failed-submission");
     }
-  }, [error, navigate]);
+  }, [success, alreadySubmitted, submissionFailed, navigate]);
 
   const handleSubmit = async () => {
     try {
@@ -78,12 +68,13 @@ const CustomSubmitButton = ({ onClick, onValidate }) => {
         message.error("Please complete all fields before proceeding.");
         return;
       }
+
       if (finalPayload) {
         await dispatch(addSurvey(finalPayload));
       }
+
       dispatch(resetSurveyData());
     } catch (err) {
-      console.error("Unexpected error during submission:", err);
       message.error("An unexpected error occurred. Please try again.");
     }
   };
@@ -153,6 +144,7 @@ const CustomSubmitButton = ({ onClick, onValidate }) => {
           }}
         />
       </div>
+      {loading && <CustomLoading />}
     </div>
   );
 };
