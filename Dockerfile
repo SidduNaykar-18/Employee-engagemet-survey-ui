@@ -1,0 +1,18 @@
+
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN npm install -f
+
+COPY . .
+
+# RUN ls -la
+
+RUN npm run build
+
+EXPOSE 3007
+
+CMD ["npm", "run", "start"]
