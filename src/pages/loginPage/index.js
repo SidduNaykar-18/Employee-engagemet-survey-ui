@@ -12,7 +12,6 @@ import {
 } from "../../utils/authStorage";
 
 const { Title } = Typography;
-
 const LoginPage = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -20,7 +19,6 @@ const LoginPage = () => {
   const dispatch = useDispatch();
 
   const { loading, error, authenticated } = useSelector((state) => state.auth);
-
   useEffect(() => {
     if (authenticated) {
       const token = sessionStorage.getItem("authToken");
