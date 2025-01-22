@@ -57,7 +57,6 @@ const LoginPage = () => {
       message.error("Login failed. Please try again later!");
     }
   };
-
   return (
     <div
       style={{
