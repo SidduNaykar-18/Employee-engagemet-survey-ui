@@ -86,7 +86,7 @@ const LoginPage = () => {
         >
           <Form.Item
             name="email"
-            label="Username"
+            label="Email"
             rules={[
               { required: true, message: "Please enter your email!" },
               { type: "email", message: "Please enter a valid email address!" },
