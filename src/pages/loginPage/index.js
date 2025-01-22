@@ -1,25 +1,60 @@
-import React, { useState } from "react";
-import { Form, Input, Button, Card, Typography } from "antd";
+import React, { useEffect } from "react";
+import { Form, Input, Button, Card, Typography, message } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../../redux/slices/authSlice";
+import { Link } from "react-router-dom";
+import {
+  setAuthToken,
+  setAuthTokenExpiration,
+  isTokenExpired,
+} from "../../utils/authStorage";
 
 const { Title } = Typography;
 
-const LoginPage = ({ onLogin }) => {
-  const [loading, setLoading] = useState(false);
+const LoginPage = () => {
+  const [form] = Form.useForm();
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
+
+  const { loading, error, authenticated } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (authenticated) {
+      const token = sessionStorage.getItem("authToken");
+      const expirationTime = sessionStorage.getItem("authTokenExpiration");
+
+      if (isTokenExpired(expirationTime)) {
+        navigate("/employee-engagement/login");
+      } else {
+        const redirectPath =
+          location.state?.from || "/employee-engagement/final-survey";
+        navigate(redirectPath);
+      }
+    }
+  }, [authenticated, navigate, location.state]);
 
   const handleFinish = async (values) => {
-    setLoading(true);
-    const isAuthenticated = true; 
+    try {
+      const action = await dispatch(loginUser(values)).unwrap();
+      if(action?.status ==="success"){
+        message.success(action?.message);
+      }
+      const expiresIn = 60 * 60 * 1000;
+      const expirationTime = Date.now() + expiresIn;
+      setAuthToken(action.token);
+      setAuthTokenExpiration(expirationTime);
     
-    if (isAuthenticated) {
-      onLogin(true); 
-      const redirectPath = location.state?.from || "/employee-engagement/final-survey";
-      navigate(redirectPath);
-    } else {
-      setLoading(false);
+      if (isTokenExpired(expirationTime)) {
+        navigate("/employee-engagement/login");
+      } else {
+        navigate("/employee-engagement/final-survey");
+      }
+    } catch (err) {
+      console.error("Login failed:", err);
+      message.error("Login failed. Please try again later!");
     }
   };
 
@@ -41,20 +76,21 @@ const LoginPage = ({ onLogin }) => {
         }}
       >
         <Title level={3} style={{ textAlign: "center", marginBottom: 24 }}>
-          HR Login
+          Employee Engagement Login
         </Title>
         <Form
           layout="vertical"
+          form={form}
           onFinish={handleFinish}
           initialValues={{ email: "", password: "" }}
         >
           <Form.Item
             name="email"
-            label="Email"
-            rules={[
-              { required: true, message: "Please enter your email!" },
-              { type: "email", message: "Please enter a valid email address!" },
-            ]}
+            label="Username"
+            // rules={[
+            //   { required: true, message: "Please enter your email!" },
+            //   { type: "email", message: "Please enter a valid email address!" },
+            // ]}
           >
             <Input
               prefix={<UserOutlined />}
@@ -77,16 +113,25 @@ const LoginPage = ({ onLogin }) => {
 
           <Form.Item>
             <Button
-              type="primary"
               htmlType="submit"
               size="large"
-              style={{ width: "100%" }}
+              style={{
+                width: "100%",
+                backgroundColor: "#DFE5FC",
+                borderRadius: "30px",
+                overflow: "hidden",
+                transition: "all 300ms ease-out",
+              }}
               loading={loading}
             >
               Login
             </Button>
           </Form.Item>
         </Form>
+
+        <div style={{ textAlign: "center" }}>
+          <Link to="/employee-engagement/change-password">Change Password</Link>
+        </div>
       </Card>
     </div>
   );

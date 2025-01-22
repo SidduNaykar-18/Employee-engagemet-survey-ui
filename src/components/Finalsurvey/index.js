@@ -14,16 +14,15 @@ const FinalSurvey = () => {
 
   useEffect(() => {
     const surveyId =
-      process.env.REACT_APP_SURVEY_ID || "e74af703-e6f1-48d2-8965-73c723b5e40e";
+      process.env.REACT_APP_SURVEY_ID || "6118c541-110f-4bd1-8bcf-72de4c8759bf";
     dispatch(getAllSurveys(surveyId));
   }, [dispatch]);
 
-  // Filter and group the survey data while maintaining unique questions
+ 
   const groupedQuestions = Array.isArray(surveys) ? surveys.reduce((acc, employee) => {
     employee.responses.forEach((response) => {
       const { questionGroupTitle, question, submittedAnswer } = response;
 
-      // Create a group if not existing
       if (!acc[questionGroupTitle]) {
         acc[questionGroupTitle] = [];
       }

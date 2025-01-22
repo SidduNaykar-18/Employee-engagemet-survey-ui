@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../../api/axiosInstance";
+import { getAuthToken } from "../../../utils/authStorage";
 
 export const addSurvey = createAsyncThunk(
   "survey/addSurvey",
@@ -17,8 +18,14 @@ export const getAllSurveys = createAsyncThunk(
   "survey/getAllSurveys",
   async (surveyId, { rejectWithValue }) => {
     try {
+      const token = getAuthToken();  
       const response = await axiosInstance.get(
-        `/response?survey-id=${surveyId}`
+        `/response?survey-id=${surveyId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,  
+          },
+        }
       );
       return response?.data;
     } catch (error) {
