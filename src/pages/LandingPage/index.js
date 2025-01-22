@@ -77,7 +77,7 @@ const LandingPage = () => {
                 lineHeight: "1.2",
               }}
             >
-              Employe <br /> Engagement Survey
+              Employee <br /> Engagement Survey
               <Paragraph
                 style={{
                   fontSize: "18px",

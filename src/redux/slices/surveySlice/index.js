@@ -125,8 +125,6 @@ const surveySlice = createSlice({
     });
     builder.addCase(addSurvey.fulfilled, (state, action) => {
       state.loading = false;
-    
-      // Check the message in the response
       if (action.payload.message === 'Sorry, You have already Submitted') {
         state.alreadySubmitted = true;
         state.success = false;

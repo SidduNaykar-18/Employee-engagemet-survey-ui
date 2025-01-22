@@ -5,6 +5,7 @@ import { updateSurveyData } from "../../redux/slices/surveySlice";
 
 const CustomInputTextCard = ({ data, section, inputKey, value, onChange }) => {
   const [inputValue, setInputValue] = useState(value || "");
+console.log("check value========",value);
 
   const dispatch = useDispatch();
 
@@ -67,7 +68,7 @@ const CustomInputTextCard = ({ data, section, inputKey, value, onChange }) => {
           }}
         >
           <Input
-            value={inputValue}
+            value={value?.inputValue}
             onChange={handleInputChange}
             placeholder="Type Your Answer here..!"
             style={{

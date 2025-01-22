@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import axiosInstance from '../../../api/axiosInstance';
 
-// Async Thunks for Login and Signup
 export const loginUser = createAsyncThunk(
   'user/loginUser',
   async (credentials, { rejectWithValue }) => {
@@ -27,12 +26,6 @@ export const signupUser = createAsyncThunk(
   }
 );
 
-
-
-
-
-
-
 // Auth Slice
 const authSlice = createSlice({
   name: 'auth',
@@ -41,15 +34,16 @@ const authSlice = createSlice({
     token: null,
     loading: false,
     error: null,
+    authenticated: false, 
   },
   reducers: {
     logout: (state) => {
       state.user = null;
       state.token = null;
+      state.authenticated = false;
     },
   },
   extraReducers: (builder) => {
-    // Login User
     builder.addCase(loginUser.pending, (state) => {
       state.loading = true;
       state.error = null;
@@ -58,10 +52,12 @@ const authSlice = createSlice({
       state.loading = false;
       state.user = action.payload.user;
       state.token = action.payload.token;
+      state.authenticated = true; 
     });
     builder.addCase(loginUser.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
+      state.authenticated = false; 
     });
 
     // Signup User
