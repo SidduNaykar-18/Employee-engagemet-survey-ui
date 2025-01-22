@@ -87,10 +87,10 @@ const LoginPage = () => {
           <Form.Item
             name="email"
             label="Username"
-            // rules={[
-            //   { required: true, message: "Please enter your email!" },
-            //   { type: "email", message: "Please enter a valid email address!" },
-            // ]}
+            rules={[
+              { required: true, message: "Please enter your email!" },
+              { type: "email", message: "Please enter a valid email address!" },
+            ]}
           >
             <Input
               prefix={<UserOutlined />}
